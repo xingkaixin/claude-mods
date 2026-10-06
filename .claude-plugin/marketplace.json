@@ -1,0 +1,12 @@
+{
+  "name": "claude-mods",
+  "owner": { "name": "XingKaiXin", "url": "https://github.com/xingkaixin" },
+  "metadata": { "description": "Claude Code mods by XingKaiXin" },
+  "plugins": [
+    {
+      "name": "tps-meter",
+      "source": "./mods/tps-meter",
+      "description": "Live output tokens per second in the prompt footer"
+    }
+  ]
+}
