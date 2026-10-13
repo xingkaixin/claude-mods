@@ -63,8 +63,8 @@ for (const surface of ['terminal', 'desktop'] as const) {
     await drained
 
     expect(seen.some(value => value?.startsWith('⚡'))).toBe(true)
-    // First text at t=300, stop at t=1500: 60 tokens over 1.2 s.
-    expect(await readout(ui)).toBe('· 50.0 tok/s')
+    // Request sent at t=0, stop at t=1500: 60 tokens over 1.5 s.
+    expect(await readout(ui)).toBe('· 40.0 tok/s')
     await ui.unmount()
   })
 }

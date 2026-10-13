@@ -6,7 +6,7 @@ import type { Tps } from '../types'
 const tps = atom({ plugin: 'tps-meter', key: 'tps' } as const, null)
 
 const PUBLISH_INTERVAL_MS = 250
-// Below this the elapsed time is mostly chunk-arrival jitter, not generation speed.
+// Below this the elapsed time is mostly jitter, not a meaningful rate.
 const MIN_ELAPSED_MS = 200
 
 export const register: Register = on => {
@@ -18,30 +18,34 @@ export const register: Register = on => {
       return yield* next(e)
     }
 
-    let firstAt: number | undefined
+    const startedAt = await $.clock.now()
     let lastPublishAt = 0
     let chars = 0
+    let hasOutput = false
+    let hasThinking = false
 
     const publish = (value: Tps) => update($, tps, () => value)
 
     for await (const chunk of next(e)) {
       if (chunk.kind === 'text' || chunk.kind === 'thinking' || chunk.kind === 'input') {
         const now = await $.clock.now()
-        firstAt ??= now
+        hasOutput = true
+        hasThinking ||= chunk.kind === 'thinking'
         chars += chunk.kind === 'input' ? chunk.json.length : chunk.text.length
 
-        const elapsed = now - firstAt
+        const elapsed = now - startedAt
         if (elapsed >= MIN_ELAPSED_MS && now - lastPublishAt >= PUBLISH_INTERVAL_MS) {
           lastPublishAt = now
           await publish({ value: chars / charsPerToken / (elapsed / 1000), isLive: true })
         }
       }
 
-      if (chunk.kind === 'stop' && firstAt !== undefined) {
-        const elapsed = (await $.clock.now()) - firstAt
+      if (chunk.kind === 'stop' && hasOutput) {
+        const elapsed = (await $.clock.now()) - startedAt
         const tokens = chunk.usage?.output_tokens ?? 0
 
-        if (tokens > 0 && chars > 0) {
+        // output_tokens counts thinking even when its text is withheld, which would skew the ratio.
+        if (tokens > 0 && chars > 0 && !hasThinking) {
           charsPerToken = chars / tokens
         }
 

@@ -65,15 +65,15 @@ Before any output, Desktop shows `– tok/s`, which also tells you the mod is lo
 
 ### How it is computed
 
-Each model request (`turn.step`) is measured on its own. Timing starts at the first output chunk and ends at the `stop` chunk, so time to first token is excluded. Thinking, text and tool-call arguments all count as output.
+Each model request (`turn.step`) is measured on its own. Timing starts when the request is sent and ends at the `stop` chunk, so time to first token is included. The readout matches a speed computed from session logs, not the pure generation speed. Thinking, text and tool-call arguments all count as output.
 
-- **Live value**: characters received ÷ characters per token ÷ seconds elapsed. Characters per token starts at 4 (a typical value for English) and is recalibrated from the real `output_tokens` after each request. For CJK text the live value of the first request therefore reads low.
-- **Final value**: `output_tokens` ÷ seconds from the first chunk to the end.
+- **Live value**: characters received ÷ characters per token ÷ seconds elapsed. Characters per token starts at 4 (a typical value for English) and is recalibrated from the real `output_tokens` after each request. For CJK text the live value of the first request therefore reads low. Requests with thinking are skipped for recalibration: `output_tokens` includes thinking tokens even when the thinking text is withheld, which would push the ratio too low and inflate later live values.
+- **Final value**: `output_tokens` ÷ seconds from sending the request to the end.
 
 ### Limits
 
 - Only the main thread is measured; subagent output is not counted.
-- A request whose first chunk and end are less than 200 ms apart does not update the readout. Over such a short span the timing mostly reflects network jitter, not generation speed.
+- A request that finishes less than 200 ms after it is sent does not update the readout. Over such a short span the timing mostly reflects jitter, not a meaningful rate.
 - An interrupted request carries no usage, so the readout keeps the last estimate.
 
 ## Development
