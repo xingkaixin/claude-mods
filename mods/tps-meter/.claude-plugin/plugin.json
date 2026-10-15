@@ -1,6 +1,6 @@
 {
   "name": "tps-meter",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Shows the model's live output tokens per second next to the prompt.",
   "author": { "name": "XingKaiXin", "url": "https://github.com/xingkaixin" },
   "types": "./types/index.d.ts"
