@@ -5,7 +5,7 @@ import type { On, TurnStepChunk } from 'claude-code'
 const STEP = { turnId: 't1', index: 0, model: 'claude-opus-5-5', messageCount: 1 }
 const USAGE = { input_tokens: 1, output_tokens: 60, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, model: 'm' }
 const PROMPT_HINT = { isDraft: false, isWorking: true, hint: 'esc to interrupt' }
-const SESSION_MODE = { modes: ['focus'] }
+const ABOVE_PROMPT = { hasSurvey: false, isWorking: true, maxRows: 12, bodyColumns: 80, scroll: { offset: 0, bodyRows: 12 }, view: {} }
 
 type Surface = 'terminal' | 'desktop'
 
@@ -15,16 +15,16 @@ const drawEngineDefaults = (on: On) => {
     const { Text } = $.ui.resolve(e)
     return <Text>{`${e.props.hint}${e.props.tail ?? ''}`}</Text>
   })
-  on('ui.render', { component: 'SessionMode' }, ($, e) => {
-    const { Text } = $.ui.resolve(e)
-    return <Text>{e.props.modes.join(' & ')}</Text>
+  on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
+    const { Box } = $.ui.resolve(e)
+    return <Box />
   })
 }
 
 const mountReadout = ($: Engine, surface: Surface) =>
   surface === 'terminal'
     ? $.ui.mount({ plugin: 'tps-meter', surface, component: 'PromptHint', props: PROMPT_HINT })
-    : $.ui.mount({ plugin: 'tps-meter', surface, component: 'SessionMode', props: SESSION_MODE })
+    : $.ui.mount({ plugin: 'tps-meter', surface, component: 'AbovePrompt', props: ABOVE_PROMPT })
 
 const readout = async (ui: Awaited<ReturnType<typeof mountReadout>>) => {
   const found = await ui.find({ type: 'Text', text: /tok\/s/ })

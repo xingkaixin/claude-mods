@@ -54,7 +54,7 @@ claude plugin update tps-meter@claude-mods      # 有新版本就更新，否则
 | 界面 | 位置 |
 | --- | --- |
 | 终端 | 提示框下方的提示行末尾，例如 `bypass permissions on (shift+tab to cycle)` 后面 |
-| Desktop | 输入框下方的页脚 |
+| Desktop | 输入框上方右侧 |
 
 读数有两种状态：
 

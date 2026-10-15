@@ -72,10 +72,10 @@ export const register: Register = on => {
     return next({ ...e, props: { ...e.props, tail: `  ${label(current)}` } })
   })
 
-  // Only the terminal draws PromptHint's tail. The desktop draws a SessionMode tree in its footer,
-  // but not a rewritten `modes`, so the readout is drawn as our own tree around the engine's.
-  on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
-    if (e.surface === 'terminal') {
+  // Only the terminal draws PromptHint's tail. The desktop's row footer puts plugin trees on a line
+  // of their own under it, so the readout goes in the band above the prompt, at its right end.
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    if (e.surface === 'terminal' || e.props.hasSurvey) {
       return next(e)
     }
 
@@ -84,9 +84,11 @@ export const register: Register = on => {
     const below = await next(e)
 
     return (
-      <Box flexDirection="row" alignItems="center" gap={1}>
-        <Text dimColor>{current === null ? '– tok/s' : label(current)}</Text>
+      <Box flexDirection="column">
         {below}
+        <Box justifyContent="flex-end">
+          <Text dimColor>{current === null ? '– tok/s' : label(current)}</Text>
+        </Box>
       </Box>
     )
   })

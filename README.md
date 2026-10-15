@@ -54,7 +54,7 @@ Shows the model's live output speed (tokens/s) while it responds:
 | Surface | Where |
 | --- | --- |
 | Terminal | At the end of the hint line under the prompt, e.g. after `bypass permissions on (shift+tab to cycle)` |
-| Desktop | In the footer under the input box |
+| Desktop | Above the input box, at the right |
 
 The readout has two states:
 
